@@ -6,7 +6,7 @@ SX1278
 ST7789
 
 # 连接
-## esp32管脚
+
 ![esp32管脚](img/esp32pins.jpeg)
 
 |  SX1278管脚   | ESP32管脚  |
