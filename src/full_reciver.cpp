@@ -3,41 +3,33 @@
 #include <Arduino.h>
 #include <TFT_eSPI.h> // Graphics and font library for ILI9341 driver chip
 
-#define ss 5
-#define rst 14
-#define dio0 21
+#define SS 5
+#define RST 22
+#define DIO0 21
+
+#define SCK 18
+#define MISO 19
+#define MOSI 23
+
+
+SPIClass LoRaSPI;
 
 #define TFT_GREY 0x5AEB // New colour
-
-TFT_eSPI TFT = TFT_eSPI();
-
-TFT_eSprite eSprite = TFT_eSprite(&TFT);
+TFT_eSPI tft = TFT_eSPI();  // Invoke library
 
 void setup()
 {
-  setup_screen();
   setup_lora();
-}
-
-void setup_screen()
-{
-  TFT.init();
-  TFT.setRotation(1);
-  TFT.fillScreen(TFT_BLUE);
-  TFT.initDMA();
-  eSprite.setTextFont(1);
-  eSprite.setTextColor(TFT_WHITE);
-  eSprite.createSprite(240, 240);
+  setup_screen();
 }
 
 void setup_lora()
 {
   Serial.begin(115200);
-  while (!Serial)
-    ;
-  Serial.println("LoRa Receiver");
 
-  LoRa.setPins(ss, rst, dio0); //setup LoRa transceiver module
+  LoRaSPI.begin(SCK, MISO, MOSI, SS);
+  LoRa.setSPI(LoRaSPI);
+  LoRa.setPins(SS, RST, DIO0); //setup LoRa transceiver module
 
   while (!LoRa.begin(433E6)) //433E6 - Asia, 866E6 - Europe, 915E6 - North America
   {
@@ -48,20 +40,34 @@ void setup_lora()
   Serial.println("LoRa Initializing OK!");
 }
 
+
+void setup_screen()
+{
+   tft.init();
+   tft.setRotation(2);
+}
+
+
 void loop()
 {
+  loop_lora();
   loop_screen();
 }
 
 void loop_screen()
 {
-  eSprite.setTextFont(1);
-  eSprite.setCursor(20, 20);
-  eSprite.println("Hello World\n");
-  eSprite.setCursor(40, 40);
-  eSprite.println("Hello World\n");
-  eSprite.pushSprite(0, 0);
-  delay(1000);
+ // Fill screen with grey so we can see the effect of printing with and without
+   // a background colour defined
+   tft.fillScreen(TFT_GREY);
+
+   // Set "cursor" at top left corner of display (0,0) and select font 2
+   // (cursor will move to next line automatically during printing with 'tft.println'
+   //  or stay on the line is there is room for the text with tft.print)
+   tft.setCursor(0, 0, 2);
+   // Set the font colour to be white with a black background, set text size multiplier to 1
+   tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
+   // We can now plot text on screen using the "print" class
+   tft.println("Hello World!");
 }
 
 void loop_lora()
