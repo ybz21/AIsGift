@@ -82,16 +82,13 @@ void loop_lora()
       String LoRaData = LoRa.readString();
       Serial.print(LoRaData);
 
-       tft.fillScreen(TFT_GREY);
-
-         // Set "cursor" at top left corner of display (0,0) and select font 2
-         // (cursor will move to next line automatically during printing with 'tft.println'
-         //  or stay on the line is there is room for the text with tft.print)
-         tft.setCursor(0, 0, 2);
-         // Set the font colour to be white with a black background, set text size multiplier to 1
-         tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
-      tft.println("recive data: "+LoRaData);
+      tft.fillScreen(TFT_GREY);
+      tft.setCursor(0, 0, 2);
+      tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(2);
+      tft.println("receive data:");
+      tft.println(LoRaData);
     }
+
     Serial.print("' with RSSI "); // print RSSI of packet
     Serial.println(LoRa.packetRssi());
   }
